@@ -7,7 +7,7 @@
   
   Each constructor function has unique properties and methods that are defined in their block comments below:
 */
-  
+
 /*
   === GameObject ===
   * createdAt
@@ -16,13 +16,13 @@
   * destroy() // prototype method that returns: `${this.name} was removed from the game.`
 */
 
-function GameObject (params){
+function GameObject(params) {
   this.createdAt = params.createdAt;
   this.name = params.name;
   this.dimensions = params.dimensions;
 }
 
-GameObject.prototype.destroy = function(){
+GameObject.prototype.destroy = function() {
   return `${this.name} was removed from the game.`;
 };
 
@@ -40,8 +40,8 @@ function CharacterStats(params) {
 }
 
 CharacterStats.prototype.takeDamage = function() {
-  return `${this.name} took dammage.`
-}
+  return `${this.name} took dammage.`;
+};
 
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
@@ -52,89 +52,217 @@ CharacterStats.prototype.takeDamage = function() {
   * should inherit destroy() from GameObject through CharacterStats
   * should inherit takeDamage() from CharacterStats
 */
- Humanoid.prototype = Object.create(CharacterStats.prototype);
-function Humanoid(params){
+Humanoid.prototype = Object.create(CharacterStats.prototype);
+function Humanoid(params) {
   CharacterStats.call(this, params);
   this.team = params.team;
   this.weapons = params.weapons;
   this.language = params.language;
 }
 
-Humanoid.prototype.greet = function(){
+Humanoid.prototype.greet = function() {
   return `${this.name} offers a greeting in ${this.language}`;
+};
+
+Villain.prototype = Object.create(Humanoid.prototype);
+function Villain(params) {
+  Humanoid.call(this, params);
+  this.type = params.type;
 }
+
+Villain.prototype.psychicBlast = function(target) {
+  console.log(target.healthPoints);
+  let dmg = Math.floor(Math.random() * 11);
+  let drain = Math.floor(Math.random() * 5);
+  if (this.healthPoints < 1) {
+    return "Can' attack, I'm dead";
+  } else if (target.healthPoints < 1) {
+    return `Can't target ${target.name}. They are food for the worms`;
+  } else if (target.healthPoints <= dmg) {
+    target.healthPoints = 0;
+    if (Math.floor(Math.random() * 11) > 6) {
+      this.healthPoints -= drain;
+      if (this.healthPoints < 1) {
+        return `Psychic blast does ${dmg} damage to ${target.name}.${
+          this.name
+        } is drained and does ${drain} to themselves. Killing blow! ${target.destroy()}. ${this.destroy()}`;
+      } else {
+        return `Psychic blast does ${dmg} damage to ${target.name}.${
+          this.name
+        } is drained and does ${drain} damage to themselves. Killing blow! ${target.destroy()}`;
+      }
+    } else {
+      return `Psychic blast does ${dmg} damage to ${
+        target.name
+      }. Killing blow! ${target.destroy()}`;
+    }
+  } else {
+    target.healthPoints = target.healthPoints - dmg;
+    if (Math.floor(Math.random() * 11) > 6) {
+      if (target.healthPoints < 1) {
+        this.healthPoints -= drain;
+        return `PsychicBlast does ${dmg} damage to ${target.name}.${
+          this.name
+        } is drained and does ${drain} damage to themselves. ${target.destroy()}`;
+      } else {
+        this.healthPoints -= drain;
+        return `PsychicBlast does ${dmg} damage to ${target.name}.${
+          this.name
+        } is drained and does ${drain} damage to themselves. ${
+          target.name
+        } has ${target.healthPoints} health left`;
+      }
+    } else {
+      if (target.healthPoints < 1) {
+        return `PsychicBlast does ${dmg} to ${
+          target.name
+        }. ${target.destroy()}`;
+      } else {
+        return `PsychicBlast does ${dmg} to ${target.name}. ${
+          target.name
+        } has ${target.healthPoints} health left`;
+      }
+    }
+  }
+};
+
+Hero.prototype = Object.create(Humanoid.prototype);
+
+function Hero(params) {
+  Humanoid.call(this, params);
+  this.type = params.type;
+}
+
+Hero.prototype.smite = function(target) {
+  let dmg = Math.floor(Math.random() * 5);
+  let heal = Math.round(dmg / 2);
+  if (this.healthPoints < 1) {
+    return "Can' attack, I'm dead";
+  } else if (target.healthPoints < 1) {
+    return `Can't attack ${target.name}. They have already perished`;
+  } else if (dmg === 0) {
+    return `Smite missed`;
+  } else if (target.healthPoints <= dmg) {
+    target.healthPoints = 0;
+    this.healthPoints += heal;
+    return `Smite does ${dmg} damage to ${target.name}. ${
+      this.name
+    } heals for ${heal} health. Killing blow! ${target.destroy()}`;
+  } else {
+    target.healthPoints = target.healthPoints - dmg;
+    this.healthPoints += heal;
+    if (target.healthPoints < 1) {
+      return `Smite does ${dmg} damage to ${target.name}. ${
+        this.name
+      } heals for ${heal} health. ${target.destroy()}`;
+    } else {
+      return `Smite does ${dmg} damage to ${target.name}. ${
+        this.name
+      } heals for ${heal} health. ${target.name} has ${
+        target.healthPoints
+      } health left`;
+    }
+  }
+};
 /*
-  * Inheritance chain: GameObject -> CharacterStats -> Humanoid
-  * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
-  * Instances of CharacterStats should have all of the same properties as GameObject.
-*/
+ * Inheritance chain: GameObject -> CharacterStats -> Humanoid
+ * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
+ * Instances of CharacterStats should have all of the same properties as GameObject.
+ */
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
+const mage = new Humanoid({
+  createdAt: new Date(),
+  dimensions: {
+    length: 2,
+    width: 1,
+    height: 1
+  },
+  healthPoints: 5,
+  name: "Bruce",
+  team: "Mage Guild",
+  weapons: ["Staff of Shamalama"],
+  language: "Common Tongue"
+});
 
-  const mage = new Humanoid({
-    createdAt: new Date(),
-    dimensions: {
-      length: 2,
-      width: 1,
-      height: 1,
-    },
-    healthPoints: 5,
-    name: 'Bruce',
-    team: 'Mage Guild',
-    weapons: [
-      'Staff of Shamalama',
-    ],
-    language: 'Common Tongue',
-  });
+const swordsman = new Humanoid({
+  createdAt: new Date(),
+  dimensions: {
+    length: 2,
+    width: 2,
+    height: 2
+  },
+  healthPoints: 15,
+  name: "Sir Mustachio",
+  team: "The Round Table",
+  weapons: ["Giant Sword", "Shield"],
+  language: "Common Tongue"
+});
 
-  const swordsman = new Humanoid({
-    createdAt: new Date(),
-    dimensions: {
-      length: 2,
-      width: 2,
-      height: 2,
-    },
-    healthPoints: 15,
-    name: 'Sir Mustachio',
-    team: 'The Round Table',
-    weapons: [
-      'Giant Sword',
-      'Shield',
-    ],
-    language: 'Common Tongue',
-  });
+const archer = new Humanoid({
+  createdAt: new Date(),
+  dimensions: {
+    length: 1,
+    width: 2,
+    height: 4
+  },
+  healthPoints: 10,
+  name: "Lilith",
+  team: "Forest Kingdom",
+  weapons: ["Bow", "Dagger"],
+  language: "Elvish"
+});
 
-  const archer = new Humanoid({
-    createdAt: new Date(),
-    dimensions: {
-      length: 1,
-      width: 2,
-      height: 4,
-    },
-    healthPoints: 10,
-    name: 'Lilith',
-    team: 'Forest Kingdom',
-    weapons: [
-      'Bow',
-      'Dagger',
-    ],
-    language: 'Elvish',
-  });
+const warlock = new Villain({
+  createdAt: new Date(),
+  dimensions: {
+    length: 1,
+    width: 2,
+    height: 4
+  },
+  healthPoints: 10,
+  name: "Gul'van",
+  team: "Nights Cult",
+  weapons: ["Staff", "Focus"],
+  language: "Orcish",
+  type: "Villain"
+});
 
-  console.log(mage.createdAt); // Today's date
-  console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-  console.log(swordsman.healthPoints); // 15
-  console.log(mage.name); // Bruce
-  console.log(swordsman.team); // The Round Table
-  console.log(mage.weapons); // Staff of Shamalama
-  console.log(archer.language); // Elvish
-  console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-  console.log(mage.takeDamage()); // Bruce took damage.
-  console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
+const paladin = new Hero({
+  createdAt: new Date(),
+  dimensions: {
+    length: 1,
+    width: 2,
+    height: 4
+  },
+  healthPoints: 10,
+  name: "Lothbar",
+  team: "Heralds of Light",
+  weapons: ["Mace", "Shield"],
+  language: "Common",
+  type: "Hero"
+});
 
-
-  // Stretch task: 
-  // * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
-  // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
-  // * Create two new objects, one a villain and one a hero and fight it out with methods!
+/*console.log(mage.createdAt); // Today's date
+console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
+console.log(swordsman.healthPoints); // 15
+console.log(mage.name); // Bruce
+console.log(swordsman.team); // The Round Table
+console.log(mage.weapons); // Staff of Shamalama
+console.log(archer.language); // Elvish
+console.log(archer.greet()); // Lilith offers a greeting in Elvish.
+console.log(mage.takeDamage()); // Bruce took damage.
+console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.*/
+console.log(paladin.smite(warlock));
+console.log(warlock.psychicBlast(paladin));
+console.log(paladin.smite(warlock));
+console.log(warlock.psychicBlast(paladin));
+console.log(paladin.smite(warlock));
+console.log(warlock.psychicBlast(paladin));
+console.log(paladin.smite(warlock));
+console.log(warlock.psychicBlast(paladin));
+// Stretch task:
+// * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.
+// * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
+// * Create two new objects, one a villain and one a hero and fight it out with methods!
