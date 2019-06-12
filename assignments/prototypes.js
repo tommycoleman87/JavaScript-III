@@ -22,7 +22,7 @@ function GameObject(params) {
   this.dimensions = params.dimensions;
 }
 
-GameObject.prototype.destroy = function() {
+GameObject.prototype.destroy = function () {
   return `${this.name} was removed from the game.`;
 };
 
@@ -39,7 +39,7 @@ function CharacterStats(params) {
   this.healthPoints = params.healthPoints;
 }
 
-CharacterStats.prototype.takeDamage = function() {
+CharacterStats.prototype.takeDamage = function () {
   return `${this.name} took dammage.`;
 };
 
@@ -60,7 +60,7 @@ function Humanoid(params) {
   this.language = params.language;
 }
 
-Humanoid.prototype.greet = function() {
+Humanoid.prototype.greet = function () {
   return `${this.name} offers a greeting in ${this.language}`;
 };
 
@@ -70,57 +70,57 @@ function Villain(params) {
   this.type = params.type;
 }
 
-Villain.prototype.psychicBlast = function(target) {
-  console.log(target.healthPoints);
+Villain.prototype.psychicBlast = function (target) {
   let dmg = Math.floor(Math.random() * 11);
   let drain = Math.floor(Math.random() * 5);
   if (this.healthPoints < 1) {
     return "Can' attack, I'm dead";
-  } else if (target.healthPoints < 1) {
+  } else if (dmg === 0) { return 'Psychic Blast missed' }
+  else if (target.healthPoints < 1) {
     return `Can't target ${target.name}. They are food for the worms`;
   } else if (target.healthPoints <= dmg) {
     target.healthPoints = 0;
     if (Math.floor(Math.random() * 11) > 6) {
       this.healthPoints -= drain;
       if (this.healthPoints < 1) {
-        return `Psychic blast does ${dmg} damage to ${target.name}.${
+        return `Psychic blast does ${dmg} damage to ${target.name}. ${
           this.name
-        } is drained and does ${drain} to themselves. Killing blow! ${target.destroy()}. ${this.destroy()}`;
+          } is drained and does ${drain} to themselves. ${target.takeDamage()} Killing blow! ${target.destroy()}. ${this.takeDamage()} ${this.destroy()}`;
       } else {
-        return `Psychic blast does ${dmg} damage to ${target.name}.${
+        return `Psychic blast does ${dmg} damage to ${target.name}. ${
           this.name
-        } is drained and does ${drain} damage to themselves. Killing blow! ${target.destroy()}`;
+          } is drained and does ${drain} damage to themselves. ${target.takeDamage()} Killing blow! ${target.destroy()} ${this.takeDamage()}. ${this.name} has ${this.healthPoints} health left`;
       }
     } else {
       return `Psychic blast does ${dmg} damage to ${
         target.name
-      }. Killing blow! ${target.destroy()}`;
+        }. ${target.takeDamage()} Killing blow! ${target.destroy()}`;
     }
   } else {
     target.healthPoints = target.healthPoints - dmg;
     if (Math.floor(Math.random() * 11) > 6) {
       if (target.healthPoints < 1) {
         this.healthPoints -= drain;
-        return `PsychicBlast does ${dmg} damage to ${target.name}.${
+        return `PsychicBlast does ${dmg} damage to ${target.name}. ${
           this.name
-        } is drained and does ${drain} damage to themselves. ${target.destroy()}`;
+          } is drained and does ${drain} damage to themselves.${target.takeDamage()} ${target.destroy()} ${this.takeDamage()} ${this.name} has ${this.healthPoints} health left.`;
       } else {
         this.healthPoints -= drain;
-        return `PsychicBlast does ${dmg} damage to ${target.name}.${
+        return `PsychicBlast does ${dmg} damage to ${target.name}. ${
           this.name
-        } is drained and does ${drain} damage to themselves. ${
+          } is drained and does ${drain} damage to themselves. ${target.takeDamage()} ${
           target.name
-        } has ${target.healthPoints} health left`;
+          } has ${target.healthPoints} health left. ${this.takeDamage()} ${this.name} has ${this.healthPoints} health left.`;
       }
     } else {
       if (target.healthPoints < 1) {
         return `PsychicBlast does ${dmg} to ${
           target.name
-        }. ${target.destroy()}`;
+          }. ${target.takeDamage()} ${target.destroy()}`;
       } else {
-        return `PsychicBlast does ${dmg} to ${target.name}. ${
+        return `PsychicBlast does ${dmg} to ${target.name}. ${target.takeDamage()} ${
           target.name
-        } has ${target.healthPoints} health left`;
+          } has ${target.healthPoints} health left`;
       }
     }
   }
@@ -133,7 +133,7 @@ function Hero(params) {
   this.type = params.type;
 }
 
-Hero.prototype.smite = function(target) {
+Hero.prototype.smite = function (target) {
   let dmg = Math.floor(Math.random() * 5);
   let heal = Math.round(dmg / 2);
   if (this.healthPoints < 1) {
@@ -147,20 +147,20 @@ Hero.prototype.smite = function(target) {
     this.healthPoints += heal;
     return `Smite does ${dmg} damage to ${target.name}. ${
       this.name
-    } heals for ${heal} health. Killing blow! ${target.destroy()}`;
+      } heals for ${heal} health. ${target.takeDamage()} Killing blow! ${target.destroy()}`;
   } else {
     target.healthPoints = target.healthPoints - dmg;
     this.healthPoints += heal;
     if (target.healthPoints < 1) {
       return `Smite does ${dmg} damage to ${target.name}. ${
         this.name
-      } heals for ${heal} health. ${target.destroy()}`;
+        } heals for ${heal} health. ${target.takeDamage()} ${target.destroy()}`;
     } else {
       return `Smite does ${dmg} damage to ${target.name}. ${
         this.name
-      } heals for ${heal} health. ${target.name} has ${
+        } heals for ${heal} health. ${target.takeDamage()} ${target.name} has ${
         target.healthPoints
-      } health left`;
+        } health left`;
     }
   }
 };
